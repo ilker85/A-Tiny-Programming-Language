@@ -63,7 +63,11 @@ public class Scanner {
                 addToken(TokenType.STAR);
                 break;
             case '/':
-                addToken(TokenType.SLASH);
+                if(match('/')) {
+                    while(peek() != '\n' && !isAtEnd()) advance();
+                } else {
+                    addToken(TokenType.SLASH);
+                }
                 break;
             case '!': 
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
@@ -76,7 +80,15 @@ public class Scanner {
                 break;
             case '=':
                 addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
-                break;                
+                break;
+            case ' ':
+            case '\r':
+            case '\t':
+                //ignore whitespaces
+                break;
+            case '\n':
+                line++;
+                break;                                    
             default:
                 Ze.error(line, "Unexpected character");
         }
@@ -85,6 +97,11 @@ public class Scanner {
     private char advance() {
         current++;
         return source.charAt(current -1);
+    }
+
+    private char peek() {
+        if(isAtEnd()) return '\0';
+        return source.charAt(current);
     }
 
     private void addToken(TokenType type) {
